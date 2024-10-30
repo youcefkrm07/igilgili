@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration Settings</title>
+    <style>
+        :root {
+  --primary-blue: #1a73e8;
+  --hover-blue: #1557b0;
+  --bg-gray: #f8f9fa;
+  --border-gray: #dadce0;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 16px;
+  background: white;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header {
+  font-size: 24px;
+  color: var(--primary-blue);
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+
+.category {
+  margin-bottom: 24px;
+  border: 1px solid var(--border-gray);
+  border-radius: 8px;
+}
+
+.category-header {
+  background: var(--primary-blue);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px 8px 0 0;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.category-content {
+  padding: 16px;
+  display: none;
+}
+
+.category-content.active {
+  display: block;
+}
+
+.setting-group {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: var(--bg-gray);
+  border-radius: 4px;
+}
+
+.setting {
+  margin-bottom: 12px;
+}
+
+.setting-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-weight: 500;
+}
+
+.setting select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border-gray);
+  border-radius: 4px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231a73e8'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 20px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.setting select:hover {
+  border-color: var(--primary-blue);
+}
+
+.setting select:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+.setting select option {
+  padding: 12px;
+  font-size: 14px;
+}
+
+.setting input[type="text"],
+.setting input[type="number"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--border-gray);
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.setting input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.array-field {
+  border-left: 3px solid var(--primary-blue);
+  padding: 16px;
+  margin: 12px 0;
+  background: white;
+  border-radius: 0 4px 4px 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.array-field .setting-label {
+  color: var(--primary-blue);
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.array-field select {
+  background-color: var(--bg-gray);
+}
+
+.array-field:hover {
+  border-left-color: var(--hover-blue);
+  background-color: var(--bg-gray);
+  transition: all 0.2s ease;
+}
+
+.save-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--primary-blue);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 24px;
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.chevron {
+  transition: transform 0.3s;
+}
+
+.chevron.active {
+  transform: rotate(180deg);
+}
+
+#loading {
+  display: none;
+  text-align: center;
+  padding: 20px;
+}
+
+.error-message {
+  color: #d32f2f;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 4px;
+  background: #ffebee;
+  display: none;
+}
+
+.setting-checkbox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background: var(--bg-gray);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.setting-checkbox:hover {
+  background: #eef2ff;
+}
+
+.setting-checkbox input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: relative;
+  height: 24px;
+  width: 48px;
+  background-color: #ccc;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.checkmark:before {
+  content: '';
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.setting-checkbox input:checked ~ .checkmark {
+  background-color: var(--primary-blue);
+}
+
+.setting-checkbox input:checked ~ .checkmark:before {
+  transform: translateX(24px);
+}
+
+.setting-checkbox .toggle-label {
+  margin-left: 12px;
+  font-weight: 500;
+  color: #333;
+}
+
+.setting-checkbox .toggle-status {
+  margin-left: auto;
+  font-size: 14px;
+  color: #666;
+}
+
+.slider-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.slider-value {
+  min-width: 48px;
+  padding: 4px 8px;
+  background: var(--primary-blue);
+  color: white;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 14px;
+}
+
+input[type="range"] {
+  flex-grow: 1;
+  height: 4px;
+  background: var(--border-gray);
+  border-radius: 2px;
+  appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--primary-blue);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  background: var(--hover-blue);
+}
+    </style>
+</head>
+<body>
+<div class="container">
+  <h1 class="header">Configuration Settings</h1>
+  
+  <div id="loading">Loading configuration...</div>
+  <div id="error-message" class="error-message"></div>
+  
+  <div id="config-container"></div>
+  
+  <button class="save-btn" onclick="saveConfig()">Download</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+
+<script>
+// Constants for API access
+const BIN_ID = '671c3f06acd3cb34a89d11fc';
+const API_KEY = '$2a$10$3sLFuJxhvWme/vUI9565Xul5nSWc3yC2czy0whE.nOMw6Tj8Xnb0C';
+let jsonConfig;
+
+// Load configuration on page load
+document.addEventListener('DOMContentLoaded', loadConfiguration);
+
+async function loadConfiguration() {
+    const loading = document.getElementById('loading');
+    const errorMessage = document.getElementById('error-message');
+    loading.style.display = 'block';
+    errorMessage.style.display = 'none';
+
+    try {
+        const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+            headers: {
+                'X-Master-Key': API_KEY
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to load configuration');
+        }
+
+        const data = await response.json();
+        jsonConfig = data.record;
+        renderConfiguration(jsonConfig);
+    } catch (error) {
+        errorMessage.textContent = `Error: ${error.message}`;
+        errorMessage.style.display = 'block';
+    } finally {
+        loading.style.display = 'none';
+    }
+}
+
+function renderConfiguration(config) {
+    const container = document.getElementById('config-container');
+    container.innerHTML = '';
+
+    Object.entries(config).forEach(([category, settings]) => {
+        const categoryElement = createCategorySection(category, settings);
+        container.appendChild(categoryElement);
+    });
+
+    initializeEventListeners();
+}
+
+function createCategorySection(category, settings) {
+    const section = document.createElement('div');
+    section.className = 'category';
+
+    const header = document.createElement('div');
+    header.className = 'category-header';
+    header.innerHTML = `
+        <span>${category.charAt(0).toUpperCase() + category.slice(1)}</span>
+        <span class="chevron">⌵</span>
+    `;
+
+    const content = document.createElement('div');
+    content.className = 'category-content';
+
+    Object.entries(settings).forEach(([key, value]) => {
+        content.appendChild(createSettingElement(category, key, value));
+    });
+
+    section.appendChild(header);
+    section.appendChild(content);
+    return section;
+}
+
+function createSettingElement(category, key, value) {
+    const setting = document.createElement('div');
+    const fullKey = `${category}.${key}`;
+    
+    if (Array.isArray(value)) {
+        setting.className = 'array-field';
+        const formattedLabel = formatLabel(key);
+        setting.innerHTML = `
+            <label class="setting-label">
+                ${formattedLabel}
+                <span style="font-size: 12px; color: #666; margin-left: 8px;">
+                    (${value.length} options)
+                </span>
+            </label>
+            <select data-key="${fullKey}">
+                ${value.map(option => `
+                    <option value="${option}">${option}</option>
+                `).join('')}
+            </select>
+        `;
+    } else if (typeof value === 'boolean') {
+        setting.className = 'setting';
+        setting.innerHTML = `
+            <label class="setting-checkbox">
+                <input type="checkbox" data-key="${fullKey}" ${value ? 'checked' : ''}>
+                <span class="checkmark"></span>
+                <span class="toggle-label">${formatLabel(key)}</span>
+                <span class="toggle-status">${value ? 'Enabled' : 'Disabled'}</span>
+            </label>
+        `;
+    } else if (typeof value === 'number' && 
+              (key.includes('Battery') || key.includes('battery'))) {
+        setting.className = 'setting';
+        let min = 0, max = 100, step = 1;
+        
+        if (key.includes('Temp')) {
+            min = -20;
+            max = 80;
+        } else if (key.includes('Level')) {
+            min = 0;
+            max = 100;
+        }
+        
+        setting.innerHTML = `
+            <label class="setting-label">${formatLabel(key)}</label>
+            <div class="slider-container">
+                <input type="range" 
+                    data-key="${fullKey}" 
+                    value="${value}"
+                    min="${min}"
+                    max="${max}"
+                    step="${step}">
+                <span class="slider-value">${value}</span>
+            </div>
+        `;
+        
+        setTimeout(() => {
+            const slider = setting.querySelector('input[type="range"]');
+            const valueDisplay = setting.querySelector('.slider-value');
+            slider.addEventListener('input', (e) => {
+                valueDisplay.textContent = e.target.value;
+            });
+        }, 0);
+    } else if (typeof value === 'number') {
+        setting.className = 'setting';
+        setting.innerHTML = `
+            <label class="setting-label">${formatLabel(key)}</label>
+            <input type="number" data-key="${fullKey}" value="${value}">
+        `;
+    } else {
+        setting.className = 'setting';
+        setting.innerHTML = `
+            <label class="setting-label">${formatLabel(key)}</label>
+            <input type="text" data-key="${fullKey}" value="${value}">
+        `;
+    }
+    
+    return setting;
+}
+
+function formatLabel(key) {
+    return key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+}
+
+function initializeEventListeners() {
+    document.querySelectorAll('.category-header').forEach(header => {
+        header.addEventListener('click', () => {
+            const content = header.nextElementSibling;
+            const chevron = header.querySelector('.chevron');
+            content.classList.toggle('active');
+            chevron.classList.toggle('active');
+        });
+    });
+}
+
+function generateKeyFromPackageName(packageName) {
+    const FIXED_STRING = "/I am the one who knocks!";
+    const combinedString = packageName + FIXED_STRING;
+    const hash = CryptoJS.MD5(combinedString);
+    const keyBytes = hash.toString(CryptoJS.enc.Hex).substring(0, 32);
+    return CryptoJS.enc.Hex.parse(keyBytes);
+}
+
+function encryptAES(plainText, key) {
+    const encrypted = CryptoJS.AES.encrypt(plainText, key, {
+        mode: CryptoJS.mode.ECB,
+        padding: CryptoJS.pad.Pkcs7
+    });
+    return encrypted.toString();
+}
+
+function getUpdatedConfig() {
+    const updatedConfig = {};
+    document.querySelectorAll('[data-key]').forEach(element => {
+        const [category, key] = element.dataset.key.split('.');
+        if (!updatedConfig[category]) {
+            updatedConfig[category] = {};
+        }
+        let value;
+        if (element.type === 'checkbox') {
+            value = element.checked;
+        } else if (element.type === 'number' || element.type === 'range') {
+            value = parseFloat(element.value);
+        } else {
+            value = element.value;
+        }
+        updatedConfig[category][key] = value;
+    });
+    return updatedConfig;
+}
+
+function saveConfig() {
+    const packageName = prompt("Please enter the package name to encrypt the configuration:");
+    if (!packageName) {
+        alert("Package name is required to encrypt the configuration.");
+        return;
+    }
+
+    const updatedConfig = getUpdatedConfig();
+    const flattenedConfig = flattenJsonConfig(updatedConfig);
+    const jsonString = JSON.stringify(flattenedConfig, null, 2);
+    const key = generateKeyFromPackageName(packageName);
+    const encryptedContent = encryptAES(jsonString, key);
+    const blob = new Blob([encryptedContent], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'cloneSettings.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function flattenJsonConfig(config) {
+    const flattened = {};
+    
+    function flatten(obj) {
+        for (const [key, value] of Object.entries(obj)) {
+            if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                flatten(value);
+            } else if (typeof value === 'boolean' || Array.isArray(value) || typeof value === 'string' || typeof value === 'number') {
+                flattened[key] = value;
+            }
+        }
+    }
+    
+    flatten(config);
+    return flattened;
+}
+
+async function loadConfig() {
+    try {
+        await loadConfiguration();
+    } catch (error) {
+        alert('Failed to load configuration: ' + error.message);
+    }
+}
+
+loadConfig();
+</script>
+</body>
+</html>
